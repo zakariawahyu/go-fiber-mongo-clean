@@ -37,3 +37,29 @@ func (services *ProductServicesImpl) Create(request model.ProductRequest) (respo
 	}
 	return response
 }
+
+func (services *ProductServicesImpl) ListProduct() (response []model.ProductResponse) {
+	products := services.ProductRepository.SelectAll()
+
+	for _, product := range products {
+		response = append(response, model.ProductResponse{
+			Id:       product.Id,
+			Name:     product.Name,
+			Price:    product.Price,
+			Quantity: product.Quantity,
+		})
+	}
+	return response
+}
+
+func (services *ProductServicesImpl) ProductById(productId string) (response model.ProductResponse) {
+	product := services.ProductRepository.SelectById(productId)
+
+	response = model.ProductResponse{
+		Id:       product.Id,
+		Name:     product.Name,
+		Price:    product.Price,
+		Quantity: product.Quantity,
+	}
+	return response
+}

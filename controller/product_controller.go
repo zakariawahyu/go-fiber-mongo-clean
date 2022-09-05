@@ -19,6 +19,8 @@ func NewProductController(productServices *services.ProductServices) ProductCont
 
 func (controller *ProductController) Routes(app *fiber.App) {
 	app.Post("/product", controller.CreateProduct)
+	app.Get("/product", controller.GetAllProduct)
+	app.Get("/product/:id", controller.GetProductById)
 }
 
 func (controller *ProductController) CreateProduct(c *fiber.Ctx) error {
@@ -28,6 +30,25 @@ func (controller *ProductController) CreateProduct(c *fiber.Ctx) error {
 	exception.PanicIfNeeded(err)
 
 	response := controller.ProductServices.Create(request)
+	return c.JSON(model.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   response,
+	})
+}
+
+func (controller *ProductController) GetAllProduct(c *fiber.Ctx) error {
+	response := controller.ProductServices.ListProduct()
+	return c.JSON(model.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   response,
+	})
+}
+
+func (controller *ProductController) GetProductById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	response := controller.ProductServices.ProductById(id)
 	return c.JSON(model.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
