@@ -21,6 +21,8 @@ func (controller *ProductController) Routes(app *fiber.App) {
 	app.Post("/product", controller.CreateProduct)
 	app.Get("/product", controller.GetAllProduct)
 	app.Get("/product/:id", controller.GetProductById)
+	app.Put("/product/:id", controller.UpdateProductById)
+	app.Delete("/product/:id", controller.DeleteProductById)
 }
 
 func (controller *ProductController) CreateProduct(c *fiber.Ctx) error {
@@ -49,6 +51,35 @@ func (controller *ProductController) GetAllProduct(c *fiber.Ctx) error {
 func (controller *ProductController) GetProductById(c *fiber.Ctx) error {
 	id := c.Params("id")
 	response := controller.ProductServices.ProductById(id)
+	return c.JSON(model.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   response,
+	})
+}
+
+func (controller *ProductController) UpdateProductById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var request model.ProductRequest
+	err := c.BodyParser(&request)
+	exception.PanicIfNeeded(err)
+
+	_ = controller.ProductServices.ProductById(id)
+
+	response := controller.ProductServices.UpdateProduct(id, request)
+	return c.JSON(model.WebResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   response,
+	})
+}
+
+func (controller *ProductController) DeleteProductById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	
+	_ = controller.ProductServices.ProductById(id)
+
+	response := controller.ProductServices.DeleteProduct(id)
 	return c.JSON(model.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",

@@ -63,3 +63,29 @@ func (repository *ProductRepositoryImpl) SelectById(productId string) entity.Pro
 
 	return product
 }
+
+func (repository *ProductRepositoryImpl) Update(productId string, product entity.Product) *mongo.UpdateResult {
+	ctx, cancel := config.NewMongoContext()
+	defer cancel()
+
+	productUpdate := bson.M{
+		"name":     product.Name,
+		"price":    product.Price,
+		"quantity": product.Quantity,
+	}
+
+	result, err := repository.Collection.UpdateOne(ctx, bson.M{"id": productId}, bson.M{"$set": productUpdate})
+	exception.PanicIfNeeded(err)
+
+	return result
+}
+
+func (repository *ProductRepositoryImpl) Delete(productId string) *mongo.DeleteResult {
+	ctx, cancel := config.NewMongoContext()
+	defer cancel()
+
+	result, err := repository.Collection.DeleteOne(ctx, bson.M{"id": productId})
+	exception.PanicIfNeeded(err)
+
+	return result
+}

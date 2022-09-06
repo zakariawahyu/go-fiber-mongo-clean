@@ -5,6 +5,7 @@ import (
 	"github.com/zakariawahyu/go-fiber-mongo-clean/model"
 	"github.com/zakariawahyu/go-fiber-mongo-clean/repository"
 	validation2 "github.com/zakariawahyu/go-fiber-mongo-clean/validation"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ProductServicesImpl struct {
@@ -62,4 +63,22 @@ func (services *ProductServicesImpl) ProductById(productId string) (response mod
 		Quantity: product.Quantity,
 	}
 	return response
+}
+
+func (services *ProductServicesImpl) UpdateProduct(productId string, request model.ProductRequest) *mongo.UpdateResult {
+	validation2.ValidateProduct(request)
+	product := entity.Product{
+		Name:     request.Name,
+		Price:    request.Price,
+		Quantity: request.Quantity,
+	}
+
+	result := services.ProductRepository.Update(productId, product)
+	return result
+}
+
+func (services *ProductServicesImpl) DeleteProduct(productId string) *mongo.DeleteResult {
+	result := services.ProductRepository.Delete(productId)
+
+	return result
 }
